@@ -24,9 +24,11 @@ gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en 
 {
 	CLIENT *clnt;
 	int  *result_1;
-	char  conexion_1_arg;
+    char contraseña[] = "123";      // Hacemos un array para poder pasarle una contraseña/código
+    char *conexion_1_arg = contraseña;
 	bool_t  *result_2;
 	int  desconexion_1_arg;
+
 	int  *result_3;
 	TFichero  cargardatos_1_arg;
 	bool_t  *result_4;
@@ -58,9 +60,12 @@ gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en 
 	}
 #endif	/* DEBUG */
 
-	result_1 = conexion_1(&conexion_1_arg, clnt);
+	result_1 = conexion_1(conexion_1_arg, clnt);//eliminamos el & porque ya le pasamos un puntero 
 	if (result_1 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
+	}
+	else{
+		 printf("Resultado de conexion_1: %d\n", *result_1);//mostramos para saber si realmente funció
 	}
 	result_2 = desconexion_1(&desconexion_1_arg, clnt);
 	if (result_2 == (bool_t *) NULL) {

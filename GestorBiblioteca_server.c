@@ -20,6 +20,12 @@ conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
 
 	static int  result;
+		printf("conexion " );
+	fflush(stdout);
+		printf(argp);
+	fflush(stdout);
+
+
 	if (IdAdmin !=-1){
 		result=-1;
 	}
@@ -32,6 +38,7 @@ conexion_1_svc(char *argp, struct svc_req *rqstp)
 	else{
 		result =-2;
 	}
+	 printf("Resultado de conexion_1: %d\n", result);//mostramos para saber si realmente funció
 	return &result;
 }
 
@@ -40,7 +47,7 @@ desconexion_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
 
-	printf("Adios");
+	printf("desconexion");
 	fflush(stdout);
 
 	return &result;
@@ -50,6 +57,8 @@ int *
 cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 {
 	static int  result;
+	printf("cargar datos");
+	fflush(stdout);
 
 	/*
 	 * insert server code here
@@ -62,6 +71,8 @@ bool_t *
 guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
+	printf("guardar");
+	fflush(stdout);
 
 	/*
 	 * insert server code here
@@ -74,6 +85,8 @@ int *
 nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 {
 	static int  result;
+	printf("NuevoLobro");
+	fflush(stdout);
 
 	/*
 	 * insert server code here
@@ -86,6 +99,8 @@ int *
 comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
 	static int  result;
+		printf("compra");
+	fflush(stdout);
 
 	/*
 	 * insert server code here
@@ -98,6 +113,8 @@ int *
 retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
 	static int  result;
+		printf("retirar");
+	fflush(stdout);
 
 	/*
 	 * insert server code here
@@ -110,6 +127,7 @@ bool_t *
 ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
+
 
 	/*
 	 * insert server code here
