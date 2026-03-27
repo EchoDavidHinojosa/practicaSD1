@@ -20,7 +20,7 @@
 
 
 void
-gestorbiblioteca_1(char *host)
+gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en desconexion 
 {
 	CLIENT *clnt;
 	int  *result_1;
@@ -120,13 +120,13 @@ int
 main (int argc, char *argv[])
 {
 	char *host;
-
+	
 	if (argc < 2) {
 		printf ("usage: %s server_host\n", argv[0]);
 		exit (1);
 	}
 	host = argv[1];
-	MenuPrincipal();
+//	MenuPrincipal();
 	gestorbiblioteca_1 (host);
 	
 exit (0);

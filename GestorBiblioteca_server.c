@@ -12,14 +12,26 @@ int NumLibros=0; //Número de libros almacenados en el vector dinámico.
 int Tama=0; //Tamaño del vector dinámico. El incremento será por bloques de 4 libros.
 int IdAdmin=-1; //Identificador de Administración enviado al usuario.
 Cadena NomFichero=""; //Nombre del último fichero binario que se ha cargado en memoria.
-int CampoOrdenacion=0; //Campo de ordenación por que se ordenarán los libros.
+int CampoOrdenacion=0;
+
 int *
+
 conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
-	static int  result;
 
-	printf("Hola");
+	static int  result;
+	if (IdAdmin !=-1){
+		result=-1;
+	}
+	else if (strcmp(argp,"123")==0){//Uso para pruebas la ocntraseña 123
+	//printf("Hola, %s",*argp);
 	fflush(stdout);
+	result =1+rand()%RAND_MAX;
+	IdAdmin=result;
+	}
+	else{
+		result =-2;
+	}
 	return &result;
 }
 
