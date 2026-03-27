@@ -17,6 +17,8 @@
 #define MostrarAviso(Texto) { printf(Texto); Pause; }
 
 
+
+
 void
 gestorbiblioteca_1(char *host)
 {
