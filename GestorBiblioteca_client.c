@@ -65,6 +65,7 @@ gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en 
 		clnt_perror (clnt, "call failed");
 	}
 	else{
+		
 		 printf("Resultado de conexion_1: %d\n", *result_1);//mostramos para saber si realmente funció
 	}
 	result_2 = desconexion_1(&desconexion_1_arg, clnt);

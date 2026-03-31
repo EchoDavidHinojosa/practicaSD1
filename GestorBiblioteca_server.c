@@ -31,7 +31,7 @@ conexion_1_svc(char *argp, struct svc_req *rqstp)
 	}
 	else if (strcmp(argp,"123")==0){//Uso para pruebas la ocntraseña 123
 	//printf("Hola, %s",*argp);
-	fflush(stdout);
+	
 	result =1+rand()%RAND_MAX;
 	IdAdmin=result;
 	}
