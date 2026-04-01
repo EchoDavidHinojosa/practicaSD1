@@ -31,6 +31,9 @@ gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en 
 
 	int  *result_3;
 	TFichero  cargardatos_1_arg;
+	strcpy(cargardatos_1_arg.NomFile,"Biblioteca.cdat");
+
+	cargardatos_1_arg.Ida=123;
 	bool_t  *result_4;
 	int  guardardatos_1_arg;
 	int  *result_5;

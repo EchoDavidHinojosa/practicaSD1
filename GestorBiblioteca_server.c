@@ -14,8 +14,9 @@ int IdAdmin=-1; //Identificador de Administración enviado al usuario.
 Cadena NomFichero=""; //Nombre del último fichero binario que se ha cargado en memoria.
 int CampoOrdenacion=0;
 
-int *
 
+
+int *
 conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
 
@@ -26,9 +27,11 @@ conexion_1_svc(char *argp, struct svc_req *rqstp)
 	fflush(stdout);
 
 
+
 	if (IdAdmin !=-1){
 		result=-1;
 	}
+
 	else if (strcmp(argp,"123")==0){//Uso para pruebas la ocntraseña 123
 	//printf("Hola, %s",*argp);
 	
@@ -57,15 +60,40 @@ int *
 cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 {
 	static int  result;
+	
 	printf("cargar datos");
 	fflush(stdout);
+	
+	fflush(stdout);
+	FILE*fdatos=fopen(argp->NomFile,"r+b");
+	fflush(stdout);
+	fread(&NumLibros,sizeof(NumLibros),1,fdatos);
+	printf("Hay %d libros en el documento",NumLibros);
+	if(Biblioteca==NULL)
+	Biblioteca=(TLibro*)calloc(NumLibros,sizeof(TLibro));
+	else{
+		free(Biblioteca);
+		Biblioteca=(TLibro*)calloc(NumLibros,sizeof(TLibro));
+	}
+		
 
-	/*
-	 * insert server code here
-	 */
+	for (int i=0;i<NumLibros;i++){
+		TLibro LibroLeido;
+		fread(&LibroLeido,sizeof(TLibro),1,fdatos);
+		Biblioteca[i]=LibroLeido;
 
+	}
+
+
+	Tama=NumLibros;
+	strcpy(NomFichero,argp->NomFile);
+	printf( "El nombre del último fichero es %s",NomFichero);
+	for(int i=0;i<NumLibros;i++){
+		printf("Libro %d de nombre %s",i,Biblioteca[i].Titulo);
+	}
 	return &result;
 }
+
 
 bool_t *
 guardardatos_1_svc(int *argp, struct svc_req *rqstp)
