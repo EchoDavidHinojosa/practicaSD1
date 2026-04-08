@@ -115,10 +115,27 @@ bool_t *
 guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t result;
-
-	/*
-	 * insert server code here
-	 */
+	if(*argp != IdAdmin){
+		result = false;
+		printf("Error: No autorizado\n");
+		return &result;
+	}
+	else{
+		FILE *f_datos = fopen(NomFichero, "wb");
+		if (f_datos == NULL)
+		{
+			result = false;
+			printf("Error al abrir el fichero para guardar los datos.\n");
+			return &result;
+		}
+		fwrite(&NumLibros, sizeof(int), 1, f_datos);
+		for(int i=0; i<NumLibros; i++)
+		{
+			fwrite(&Biblioteca[i], sizeof(TLibro), 1, f_datos);
+		}
+		fclose(f_datos);
+		result = true;
+	}
 
 	return &result;
 }
@@ -128,9 +145,20 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 {
 	static int result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin){
+		result = -1;
+		return &result;
+	}
+	else{
+		if (NumLibros >= Tama)
+		{
+			Tama += 4;
+			Biblioteca = realloc(Biblioteca, Tama * sizeof(TLibro));
+		}
+		Biblioteca[NumLibros] = argp->Libro;
+		NumLibros++;
+		result = 1;
+	}
 
 	return &result;
 }
@@ -140,9 +168,27 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
 	static int result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin){
+		result = -1;
+		return &result;
+	}
+	else{
+		int pos = -1;
+		for(int i=0; i<NumLibros; i++){
+			if(strcmp(Biblioteca[i].Isbn, argp->Isbn) == 0){
+				pos = i;
+				break;
+			}
+		}
+		if(pos == -1){
+			result = -2; // Libro no encontrado	
+		}
+		else{
+			Biblioteca[pos].NoLibros--;
+			result = 1;
+		}
+	}
+
 
 	return &result;
 }
@@ -198,10 +244,14 @@ descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static TLibro result;
 
-	/*
-	 * insert server code here
-	 */
-
+	if(argp->Ida != IdAdmin){
+		printf("Error: No autorizado\n");
+		return NULL;
+	}
+	else{
+		result = Biblioteca[argp->Pos];	
+		printf("Libro descargado: %s", result.Titulo);
+	}
 	return &result;
 }
 

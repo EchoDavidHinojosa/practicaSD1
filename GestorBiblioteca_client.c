@@ -299,8 +299,8 @@ int main(int argc, char *argv[])
 			printf("Por favor inserte la contraseña de Administración: ");
 			//__fpurge(stdin);
 
-			//scanf("%s", password);
-			strcpy(password, "563498"); //para debug
+			// scanf("%s", password);
+			strcpy(password, "563498"); // para debug
 			res_int = conexion_1(password, clnt);
 			if (res_int == NULL)
 			{
@@ -318,6 +318,7 @@ int main(int argc, char *argv[])
 					switch (SalidaAdmin)
 					{
 					case 1:
+					{
 						arg_fichero.Ida = idAdmin;
 						printf("Introduce el nombre del fichero de datos: ");
 						__fpurge(stdin);
@@ -325,15 +326,19 @@ int main(int argc, char *argv[])
 						res_int = cargardatos_1(&arg_fichero, clnt);
 						if (res_int && *res_int == 1)
 							MostrarAviso("\n*** La biblioteca ha sido cargada. ***\n");
-						 if (res_int && *res_int == -2)
+						if (res_int && *res_int == -2)
 							MostrarAviso("\n*** No se ha podido abrir el fichero indicado. ***\n");
 						break;
+					}
 					case 2:
+					{
 						res_bool = guardardatos_1(&idAdmin, clnt);
 						if (res_bool && *res_bool)
 							MostrarAviso("\n*** Se ha guardado el estado actual de la biblioteca. ***\n");
 						break;
+					}
 					case 3:
+					{
 						arg_nuevo.Ida = idAdmin;
 						printf("Introduce el Isbn: ");
 						__fpurge(stdin);
@@ -360,6 +365,7 @@ int main(int argc, char *argv[])
 						if (res_int && *res_int == 1)
 							MostrarAviso("\n*** El libro ha sido añadido correctamente. ***\n");
 						break;
+						}
 					case 4:
 					case 5:
 						arg_comret.Ida = idAdmin;
