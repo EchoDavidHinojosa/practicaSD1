@@ -297,9 +297,10 @@ int main(int argc, char *argv[])
 		case 1:
 		{
 			printf("Por favor inserte la contraseña de Administración: ");
+			/* DESCOMENTAR */
 			//__fpurge(stdin);
-
 			// scanf("%s", password);
+			
 			strcpy(password, "563498"); // para debug
 			res_int = conexion_1(password, clnt);
 			if (res_int == NULL)
