@@ -50,6 +50,7 @@ gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en 
 	TConsulta  buscar_1_arg;
 	TLibro  *result_11;
 	TPosicion  descargar_1_arg;
+	descargar_1_arg.Pos=2;
 	int  *result_12;
 	TPosicion  prestar_1_arg;
 	int  *result_13;
@@ -110,6 +111,8 @@ gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en 
 	result_11 = descargar_1(&descargar_1_arg, clnt);
 	if (result_11 == (TLibro *) NULL) {
 		clnt_perror (clnt, "call failed");
+	}else{
+		printf("Libro mostrado %s",result_11->Titulo);
 	}
 	result_12 = prestar_1(&prestar_1_arg, clnt);
 	if (result_12 == (int *) NULL) {

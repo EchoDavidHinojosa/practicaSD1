@@ -63,8 +63,6 @@ cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 	
 	printf("cargar datos");
 	fflush(stdout);
-	
-	fflush(stdout);
 	FILE*fdatos=fopen(argp->NomFile,"r+b");
 	fflush(stdout);
 	fread(&NumLibros,sizeof(NumLibros),1,fdatos);
@@ -192,11 +190,13 @@ TLibro *
 descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static TLibro  result;
-
-	/*
-	 * insert server code here
-	 */
-
+		if(Biblioteca==NULL){
+		printf("No se han cargado los datos");
+		return NULL;
+		}
+	else{
+		result=Biblioteca[argp->Pos];
+	}
 	return &result;
 }
 
