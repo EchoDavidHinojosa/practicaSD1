@@ -116,7 +116,7 @@ guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t result;
 	if(*argp != IdAdmin){
-		result = false;
+		result = 0;
 		printf("Error: No autorizado\n");
 		return &result;
 	}
@@ -124,7 +124,7 @@ guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 		FILE *f_datos = fopen(NomFichero, "wb");
 		if (f_datos == NULL)
 		{
-			result = false;
+			result = 0;
 			printf("Error al abrir el fichero para guardar los datos.\n");
 			return &result;
 		}
@@ -134,7 +134,7 @@ guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 			fwrite(&Biblioteca[i], sizeof(TLibro), 1, f_datos);
 		}
 		fclose(f_datos);
-		result = true;
+		result = 1;
 	}
 
 	return &result;

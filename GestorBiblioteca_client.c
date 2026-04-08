@@ -311,7 +311,6 @@ int main(int argc, char *argv[])
 			{
 				idAdmin = *res_int;
 				MostrarAviso("\n*** Contraseña correcta, puede acceder al menú de Administración. ***\n");
-
 				SalidaAdmin = -1;
 				while (SalidaAdmin != 0)
 				{
