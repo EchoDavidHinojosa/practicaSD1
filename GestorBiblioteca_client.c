@@ -103,7 +103,10 @@ gestorbiblioteca_1(char *host)//Ejecuta una tras otra las llamadas parandose en 
 	result_9 = nlibros_1(&nlibros_1_arg, clnt);
 	if (result_9 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
+	}else{
+		printf("\nHay %d lirbos en total ------",*result_9);
 	}
+	
 	result_10 = buscar_1(&buscar_1_arg, clnt);
 	if (result_10 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");

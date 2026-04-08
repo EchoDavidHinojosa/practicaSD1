@@ -89,6 +89,7 @@ cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 	for(int i=0;i<NumLibros;i++){
 		printf("Libro %d de nombre %s",i,Biblioteca[i].Titulo);
 	}
+
 	return &result;
 }
 
@@ -167,9 +168,7 @@ nlibros_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	result=NumLibros;
 
 	return &result;
 }
