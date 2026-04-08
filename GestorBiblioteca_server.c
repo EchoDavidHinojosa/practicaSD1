@@ -49,7 +49,7 @@ bool_t *
 desconexion_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
-
+	
 	printf("desconexion");
 	fflush(stdout);
 
