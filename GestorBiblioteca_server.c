@@ -4,8 +4,8 @@
  * as a guideline for developing your own functions.
  */
 
-#include "GestorBiblioteca.h"
 
+#include "GestorBiblioteca.h"
 
 TLibro *Biblioteca=NULL; //Vector dinámico de libros
 int NumLibros=0; //Número de libros almacenados en el vector dinámico.
@@ -13,158 +13,6 @@ int Tama=0; //Tamaño del vector dinámico. El incremento será por bloques de 4
 int IdAdmin=-1; //Identificador de Administración enviado al usuario.
 Cadena NomFichero=""; //Nombre del último fichero binario que se ha cargado en memoria.
 int CampoOrdenacion=0; //Campo de ordenación por que se ordenarán los libros.
-int *
-conexion_1_svc(char *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	printf("Hola");
-	fflush(stdout);
-	return &result;
-}
-
-bool_t *
-desconexion_1_svc(int *argp, struct svc_req *rqstp)
-{
-	static bool_t  result;
-
-	printf("Adios");
-	fflush(stdout);
-
-	return &result;
-}
-
-int *
-cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-bool_t *
-guardardatos_1_svc(int *argp, struct svc_req *rqstp)
-{
-	static bool_t  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-int *
-nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-int *
-comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-int *
-retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-bool_t *
-ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
-{
-	static bool_t  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-int *
-nlibros_1_svc(int *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-int *
-buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-TLibro *
-descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
-{
-	static TLibro  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-int *
-prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
-
-int *
-devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
-{
-	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
-	return &result;
-}
 
 bool_t EsMenor(int P1, int P2, int Campo)
 {
@@ -194,4 +42,189 @@ bool_t EsMenor(int P1, int P2, int Campo)
 				break; 
 	}
 	return salida;
+}
+
+int *
+conexion_1_svc(char *argp, struct svc_req *rqstp)
+{
+	static int result; // Importante que sea estática
+	 /** insert server code here
+	 */
+	// si idAdmin no es -1 significa que hay un usuario conectado
+	if (IdAdmin != -1) {
+        result = -1;
+    }
+	else if (strcmp(argp, "563498")!= 0) {
+        result = -2; // Contraseña incorrecta
+    }else {
+        result = 1 + rand() % RAND_MAX; 
+		IdAdmin = result; 
+    }
+	return &result;
+}
+
+bool_t *
+desconexion_1_svc(int *argp, struct svc_req *rqstp)
+{
+	static bool_t  result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
+{
+	static int result;
+	if(argp->Ida != IdAdmin)	
+	{
+		result = -1;
+		return &result;
+	}
+	else
+	{
+		FILE *f_datos = fopen(argp->NomFile, "rb");
+		if (f_datos == NULL)
+		{
+			result = -2;
+			return &result;
+		}
+		fread(&NumLibros, sizeof(int), 1, f_datos);
+		for(int i=0; i<NumLibros; i++)
+		{
+			if (NumLibros > Tama)
+			{
+				Tama += 4;
+				Biblioteca = realloc(Biblioteca, Tama * sizeof(TLibro));
+			}
+			fread(&Biblioteca[i], sizeof(TLibro), 1, f_datos);
+		}
+		strcpy(NomFichero, argp->NomFile);
+		fclose(f_datos);
+		result = 1;
+			
+	}
+
+	return &result;
+}
+
+bool_t *
+guardardatos_1_svc(int *argp, struct svc_req *rqstp)
+{
+	static bool_t result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
+{
+	static int result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
+{
+	static int result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
+{
+	static int result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+bool_t *
+ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
+{
+	static bool_t result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+nlibros_1_svc(int *argp, struct svc_req *rqstp)
+{
+	static int result;
+
+	result = NumLibros;
+
+	return &result;
+}
+
+int *
+buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
+{
+	static int result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+TLibro *
+descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
+{
+	static TLibro result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
+{
+	static int result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
+{
+	static int result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
 }
