@@ -100,10 +100,7 @@ guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 	static bool_t  result;
 	printf("guardar");
 	fflush(stdout);
-
-	/*
-	 * insert server code here
-	 */
+		
 
 	return &result;
 }
