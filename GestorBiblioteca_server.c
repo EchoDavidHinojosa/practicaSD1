@@ -89,7 +89,7 @@ cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 	for(int i=0;i<NumLibros;i++){
 		printf("Libro %d de nombre %s",i,Biblioteca[i].Titulo);
 	}
-
+fclose(fdatos);
 	return &result;
 }
 
@@ -100,8 +100,12 @@ guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 	static bool_t  result;
 	printf("guardar");
 	fflush(stdout);
-		
-
+	FILE*fdatos=fopen(NomFichero,"w+b");	
+    fwrite(&NumLibros,sizeof(NumLibros),1,fdatos);
+	
+	for(int i=0;i<NumLibros;i++){
+		fwrite(&Biblioteca[i],sizeof(TLibro),1,fdatos);
+	}
 	return &result;
 }
 
