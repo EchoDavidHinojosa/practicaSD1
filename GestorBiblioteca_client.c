@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 			/* DESCOMENTAR */
 			//__fpurge(stdin);
 			// scanf("%s", password);
-			
+
 			strcpy(password, "563498"); // para debug
 			res_int = conexion_1(password, clnt);
 			if (res_int == NULL)
@@ -362,12 +362,28 @@ int main(int argc, char *argv[])
 						arg_nuevo.Libro.NoPrestados = 0;
 						arg_nuevo.Libro.NoListaEspera = 0;
 						res_int = nuevolibro_1(&arg_nuevo, clnt);
-						if (res_int && *res_int == 1)
-							MostrarAviso("\n*** El libro ha sido añadido correctamente. ***\n");
-						break;
+						if (res_int != NULL)
+						{
+							if (res_int && *res_int == 1)
+							{
+								MostrarAviso("\n*** El libro ha sido añadido correctamente. ***\n");
+							}
+							else if (res_int && *res_int == 0)
+							{
+								MostrarAviso("\n*** ERROR: Ya hay un libro registrado con ese ISBN. ***\n");
+							}
+							else if (res_int && *res_int == -1)
+							{
+								MostrarAviso("\n*** ERROR: No tienes permisos de Administrador válidos. ***\n");
+							}
+							if (res_int && *res_int == 1)
+								MostrarAviso("\n*** El libro ha sido añadido correctamente. ***\n");
 						}
+						break;
+					}
 					case 4:
 					case 5:
+					{
 						arg_comret.Ida = idAdmin;
 						printf("Introduce Isbn a Buscar: ");
 						__fpurge(stdin);
@@ -396,7 +412,9 @@ int main(int argc, char *argv[])
 							}
 						}
 						break;
+					}
 					case 6:
+					{
 						arg_ord.Ida = idAdmin;
 						printf("Código de Ordenación\n0. Por Isbn\n1. Por Título\n2. Por Autor\n3. Por Año\n4. Por Pais\n5. Por Idioma\n6. Por nº de libros Disponibles\n7. Por nº de libros Prestados.\n8. Por nº de libros en espera\nIntroduce Código: ");
 						scanf("%d", &arg_ord.Campo);
@@ -404,6 +422,7 @@ int main(int argc, char *argv[])
 						if (res_bool && *res_bool)
 							MostrarAviso("\n*** La biblioteca ha sido ordenada correctamente. ***\n");
 						break;
+					}
 					case 7:
 					case 8:
 					{
@@ -450,7 +469,6 @@ int main(int argc, char *argv[])
 			}
 			break;
 		}
-		case 2:
 		case 3:
 		{
 			printf("Introduce el texto a Buscar: ");
@@ -538,9 +556,56 @@ int main(int argc, char *argv[])
 		{
 			break;
 		}
+
+		case 2:
+		{
+			printf("Introduce el texto a Buscar: ");
+			__fpurge(stdin);
+			scanf("%s", texto);
+
+			printf("Código de Consulta\nI. Por Isbn\nT. Por Título\nA. Por Autor\nP. Por país\nD. Por Idioma\n*.- Por todos los campos.\nIntroduce Código: ");
+			__fpurge(stdin);
+			scanf("%c", &campo);
+			// numero total de libros
+			res_int = nlibros_1(&anonIda, clnt);
+
+			if (res_int != NULL)
+			{
+				n_libros = *res_int;
+				cabecera = TRUE;
+				int encontrados = 0;
+
+				// Recorremos todos los libros
+				for (i = 0; i < n_libros; i++)
+				{
+					arg_pos.Ida = anonIda;
+					arg_pos.Pos = i;
+					res_libro = descargar_1(&arg_pos, clnt);
+
+					if (res_libro != NULL && Comprobar(res_libro, texto, campo))
+					{
+						MostrarLibro(res_libro, i, cabecera);
+						cabecera = FALSE;
+						encontrados++;
+					}
+				}
+
+				if (encontrados == 0)
+				{
+					printf("\nNo se ha encontrado ningún libro con esos criterios.\n");
+				}
+
+				printf("\n");
+				Pause;
+			}
+			else
+			{
+				MostrarAviso("\n*** Error al comunicarse con el servidor. ***\n");
+			}
+			break;
+		}
 		}
 	}
-
 	clnt_destroy(clnt);
 	exit(0);
 }
