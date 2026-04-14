@@ -48,8 +48,7 @@ int *
 conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
 	static int result; // Importante que sea estática
-	 /** insert server code here
-	 */
+	 
 	// si idAdmin no es -1 significa que hay un usuario conectado
 	if (IdAdmin != -1) {
         result = -1;
@@ -67,10 +66,14 @@ bool_t *
 desconexion_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
-
-	/*
-	 * insert server code here
-	 */
+	if(*argp != IdAdmin){
+		result = 0;
+		printf("Error: No autorizado\n");
+	}
+	else{
+		IdAdmin = -1;
+		result = 1;
+	}
 
 	return &result;
 }
@@ -184,7 +187,7 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 			result = -2; // Libro no encontrado	
 		}
 		else{
-			Biblioteca[pos].NoLibros--;
+			Biblioteca[pos].NoLibros+= argp->NoLibros;
 			result = 1;
 		}
 	}
@@ -196,25 +199,56 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 int *
 retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
-	static int result;
+    static int result;
 
-	/*
-	 * insert server code here
-	 */
+    if(argp->Ida != IdAdmin) {
+        result = -1;
+        return &result;
+    }
 
+    int pos = -1;
+    for(int i = 0; i < NumLibros; i++) {
+        if(strcmp(Biblioteca[i].Isbn, argp->Isbn) == 0) {
+            pos = i;
+            break;
+        }
+    }
+
+    if(pos == -1) {
+        result = -2;
+    } else {
+        if (Biblioteca[pos].NoLibros >= argp->NoLibros) {
+            Biblioteca[pos].NoLibros -= argp->NoLibros;
+            result = 1;
+        } else {
+            result = 0; 
+        }
+    }
 	return &result;
 }
-
 bool_t *
 ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 {
-	static bool_t result;
+    static bool_t result;
+    TLibro aux;
 
-	/*
-	 * insert server code here
-	 */
+    if(argp->Ida != IdAdmin) {
+        result = 0;
+        return &result;
+    }
 
-	return &result;
+    for(int i = 0; i < NumLibros - 1; i++) {
+        for(int j = i + 1; j < NumLibros; j++) {
+            if(EsMenor(j, i, argp->Campo)) {
+                aux = Biblioteca[i];
+                Biblioteca[i] = Biblioteca[j];
+                Biblioteca[j] = aux;
+            }
+        }
+    }
+    
+    result = 1;
+    return &result;
 }
 
 int *
@@ -230,13 +264,22 @@ nlibros_1_svc(int *argp, struct svc_req *rqstp)
 int *
 buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
 {
-	static int result;
+    static int result;
 
-	/*
-	 * insert server code here
-	 */
+    if(argp->Ida != IdAdmin) {
+        result = -1;
+        return &result;
+    }
 
-	return &result;
+    result = -2;
+    for(int i = 0; i < NumLibros; i++) {
+        if(strcmp(Biblioteca[i].Isbn, argp->Isbn) == 0) {
+            result = i;
+            break;
+        }
+    }
+
+    return &result;
 }
 
 TLibro *
@@ -258,23 +301,54 @@ descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 int *
 prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
-	static int result;
+    static int result;
 
-	/*
-	 * insert server code here
-	 */
+    if(argp->Ida != IdAdmin) {
+        result = -1;
+        return &result;
+    }
 
-	return &result;
+    if(argp->Pos >= 0 && argp->Pos < NumLibros) {
+        if(Biblioteca[argp->Pos].NoLibros > 0) {
+            Biblioteca[argp->Pos].NoLibros--;
+            Biblioteca[argp->Pos].NoPrestados++;
+            result = 1;
+        } else {
+            Biblioteca[argp->Pos].NoListaEspera++;
+            result = 0;
+        }
+    } else {
+        result = -2;
+    }
+
+    return &result;
 }
 
 int *
 devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
-	static int result;
+    static int result;
 
-	/*
-	 * insert server code here
-	 */
+    if(argp->Ida != IdAdmin) {
+        result = -1;
+        return &result;
+    }
 
-	return &result;
+    if(argp->Pos >= 0 && argp->Pos < NumLibros) {
+        if(Biblioteca[argp->Pos].NoPrestados > 0) {
+            if(Biblioteca[argp->Pos].NoListaEspera > 0) {
+                Biblioteca[argp->Pos].NoListaEspera--;
+            } else {
+                Biblioteca[argp->Pos].NoLibros++;
+                Biblioteca[argp->Pos].NoPrestados--;
+            }
+            result = 1;
+        } else {
+            result = 0;
+        }
+    } else {
+        result = -2;
+    }
+
+    return &result;
 }

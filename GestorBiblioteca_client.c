@@ -382,37 +382,74 @@ int main(int argc, char *argv[])
 						break;
 					}
 					case 4:
-					case 5:
-					{
-						arg_comret.Ida = idAdmin;
-						printf("Introduce Isbn a Buscar: ");
-						__fpurge(stdin);
-						scanf("%s", arg_comret.Isbn);
-						arg_cons.Ida = idAdmin;
-						strcpy(arg_cons.Isbn, arg_comret.Isbn);
-						res_int = buscar_1(&arg_cons, clnt);
-						if (res_int && *res_int >= 0)
-						{
-							arg_pos.Ida = idAdmin;
-							arg_pos.Pos = *res_int;
-							res_libro = descargar_1(&arg_pos, clnt);
-							MostrarLibro(res_libro, arg_pos.Pos, TRUE);
-							printf("¿Es este el libro que deseas %s (s/n) ? ", SalidaAdmin == 4 ? "comprar más unidades" : "retirar unidades");
-							__fpurge(stdin);
-							scanf("%c", &sn);
-							if (tolower(sn) == 's')
-							{
-								printf("Introduce Número de %s: ", SalidaAdmin == 4 ? "Libros comprados" : "unidades a retirar");
-								scanf("%d", &arg_comret.NoLibros);
-								if (SalidaAdmin == 4)
-									res_int = comprar_1(&arg_comret, clnt);
-								else
-									res_int = retirar_1(&arg_comret, clnt);
-								MostrarAviso(SalidaAdmin == 4 ? "\n*** Se han añadido los nuevos libros. ***\n" : "\n*** Se han retirado el número de libros indicados. ***\n");
-							}
-						}
-						break;
-					}
+                    {
+                        arg_comret.Ida = idAdmin;
+                        printf("Introduce Isbn a Buscar: ");
+                        __fpurge(stdin);
+                        scanf("%s", arg_comret.Isbn);
+                        arg_cons.Ida = idAdmin;
+                        strcpy(arg_cons.Isbn, arg_comret.Isbn);
+                        res_int = buscar_1(&arg_cons, clnt);
+                        if (res_int && *res_int >= 0)
+                        {
+                            arg_pos.Ida = idAdmin;
+                            arg_pos.Pos = *res_int;
+                            res_libro = descargar_1(&arg_pos, clnt);
+                            MostrarLibro(res_libro, arg_pos.Pos, TRUE);
+                            printf("¿Es este el libro que deseas comprar más unidades (s/n) ? ");
+                            __fpurge(stdin);
+                            scanf("%c", &sn);
+                            if (tolower(sn) == 's')
+                            {
+                                printf("Introduce Número de Libros comprados: ");
+                                scanf("%d", &arg_comret.NoLibros);
+                                res_int = comprar_1(&arg_comret, clnt);
+                                if (res_int != NULL && *res_int == 1) {
+                                    MostrarAviso("\n*** Se han añadido los nuevos libros. ***\n");
+                                } else {
+                                     MostrarAviso("\n*** Error al comprar los libros. ***\n");
+                                }
+                            }
+                        } else {
+                            MostrarAviso("\n*** Libro no encontrado. ***\n");
+                        }
+                        break;
+                    }
+
+                    case 5:
+                    {
+                        arg_comret.Ida = idAdmin;
+                        printf("Introduce Isbn a Buscar: ");
+                        __fpurge(stdin);
+                        scanf("%s", arg_comret.Isbn);
+                        arg_cons.Ida = idAdmin;
+                        strcpy(arg_cons.Isbn, arg_comret.Isbn);
+                        res_int = buscar_1(&arg_cons, clnt);
+                        if (res_int && *res_int >= 0)
+                        {
+                            arg_pos.Ida = idAdmin;
+                            arg_pos.Pos = *res_int;
+                            res_libro = descargar_1(&arg_pos, clnt);
+                            MostrarLibro(res_libro, arg_pos.Pos, TRUE);
+                            printf("¿Es este el libro que deseas retirar unidades (s/n) ? ");
+                            __fpurge(stdin);
+                            scanf("%c", &sn);
+                            if (tolower(sn) == 's')
+                            {
+                                printf("Introduce Número de unidades a retirar: ");
+                                scanf("%d", &arg_comret.NoLibros);
+                                res_int = retirar_1(&arg_comret, clnt);
+                                if (res_int != NULL && *res_int == 1) {
+                                    MostrarAviso("\n*** Se han retirado el número de libros indicados. ***\n");
+                                } else {
+                                     MostrarAviso("\n*** Error al retirar los libros (no hay suficientes o error de ID). ***\n");
+                                }
+                            }
+                        } else {
+                             MostrarAviso("\n*** Libro no encontrado. ***\n");
+                        }
+                        break;
+                    }
 					case 6:
 					{
 						arg_ord.Ida = idAdmin;
