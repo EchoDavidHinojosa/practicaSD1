@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 	int SalidaPrincipal = -1, SalidaAdmin = -1;
 	Cadena password, texto, isbn_buscar;
 	char campo, sn;
-	int idAdmin = -1, anonIda = -1;
+	int idAdmin = -1;
 	int i, n_libros, cabecera;
 
 	int *res_int;
@@ -478,14 +478,14 @@ int main(int argc, char *argv[])
 			__fpurge(stdin);
 			scanf("%c", &campo);
 
-			res_int = nlibros_1(&anonIda, clnt);
+			res_int = nlibros_1(&idAdmin, clnt);
 			if (res_int)
 			{
 				n_libros = *res_int;
 				cabecera = TRUE;
 				for (i = 0; i < n_libros; i++)
 				{
-					arg_pos.Ida = anonIda;
+					arg_pos.Ida = idAdmin;
 					arg_pos.Pos = i;
 					res_libro = descargar_1(&arg_pos, clnt);
 					if (Comprobar(res_libro, texto, campo))
@@ -494,20 +494,18 @@ int main(int argc, char *argv[])
 						cabecera = FALSE;
 					}
 				}
-				if (SalidaPrincipal == 3)
+
+				printf("¿Quieres sacar algún libro de la biblioteca (s/n) ? ");
+				__fpurge(stdin);
+				scanf("%c", &sn);
+				if (tolower(sn) == 's')
 				{
-					printf("¿Quieres sacar algún libro de la biblioteca (s/n) ? ");
-					__fpurge(stdin);
-					scanf("%c", &sn);
-					if (tolower(sn) == 's')
-					{
-						printf("Introduce la Posición del libro a solicitar su préstamo: ");
-						scanf("%d", &arg_pos.Pos);
-						arg_pos.Pos--;
-						arg_pos.Ida = anonIda;
-						res_int = prestar_1(&arg_pos, clnt);
-						MostrarAviso("\n*** El préstamo se ha concedido, recoge el libro en el mostrador. ***\n");
-					}
+					printf("Introduce la Posición del libro a solicitar su préstamo: ");
+					scanf("%d", &arg_pos.Pos);
+					arg_pos.Pos--;
+					arg_pos.Ida = idAdmin;
+					res_int = prestar_1(&arg_pos, clnt);
+					MostrarAviso("\n*** El préstamo se ha concedido, recoge el libro en el mostrador. ***\n");
 				}
 				else
 				{
@@ -517,41 +515,71 @@ int main(int argc, char *argv[])
 			break;
 		}
 		case 4:
-		{
-			printf("Introduce el Isbn a Buscar: ");
-			__fpurge(stdin);
-			scanf("%s", isbn_buscar);
-			res_int = nlibros_1(&anonIda, clnt);
-			if (res_int)
-			{
-				n_libros = *res_int;
-				cabecera = TRUE;
-				for (i = 0; i < n_libros; i++)
-				{
-					arg_pos.Ida = anonIda;
-					arg_pos.Pos = i;
-					res_libro = descargar_1(&arg_pos, clnt);
-					if (strstr(res_libro->Isbn, isbn_buscar) != NULL)
-					{
-						MostrarLibro(res_libro, i, cabecera);
-						cabecera = FALSE;
-					}
-				}
-				printf("¿Quieres devolver algún libro de la biblioteca (s/n) ? ");
-				__fpurge(stdin);
-				scanf("%c", &sn);
-				if (tolower(sn) == 's')
-				{
-					printf("Introduce la Posición del libro a devolver: ");
-					scanf("%d", &arg_pos.Pos);
-					arg_pos.Pos--;
-					arg_pos.Ida = anonIda;
-					res_int = devolver_1(&arg_pos, clnt);
-					MostrarAviso("\n*** Se ha devuelto el libro y se pondrá en la estantería. ***\n");
-				}
-			}
-			break;
-		}
+        {
+            printf("Introduce el Isbn a Buscar: ");
+            __fpurge(stdin);
+            scanf("%127s", isbn_buscar); 
+
+            res_int = nlibros_1(&idAdmin, clnt);
+            
+            if (res_int != NULL && *res_int >= 0)
+            {
+                n_libros = *res_int;
+                cabecera = TRUE;
+                int encontrados = 0; 
+
+                for (i = 0; i < n_libros; i++)
+                {
+                    arg_pos.Ida = idAdmin;
+                    arg_pos.Pos = i;
+                    res_libro = descargar_1(&arg_pos, clnt);
+                    
+                    if (res_libro != NULL) 
+                    {
+                        if (strstr(res_libro->Isbn, isbn_buscar) != NULL)
+                        {
+                            MostrarLibro(res_libro, i, cabecera);
+                            cabecera = FALSE;
+                            encontrados++;
+                        }
+                    }
+                }
+
+                if (encontrados > 0)
+                {
+                    printf("¿Quieres devolver algún libro de la biblioteca (s/n) ? ");
+                    __fpurge(stdin);
+                    scanf("%c", &sn);
+                    if (tolower(sn) == 's')
+                    {
+                        printf("Introduce la Posición del libro a devolver: ");
+                        scanf("%d", &arg_pos.Pos);
+                        arg_pos.Pos--; 
+                        arg_pos.Ida = idAdmin;
+                        
+                        res_int = devolver_1(&arg_pos, clnt);
+                        
+                        if (res_int != NULL && *res_int == 1) 
+                        {
+                            MostrarAviso("\n*** Se ha devuelto el libro y se pondrá en la estantería. ***\n");
+                        }
+                        else
+                        {
+                            MostrarAviso("\n*** Error: No se pudo devolver el libro (Permisos o libro no prestado). ***\n");
+                        }
+                    }
+                }
+                else
+                {
+                    MostrarAviso("\n*** No se ha encontrado ningún libro con ese ISBN. ***\n");
+                }
+            }
+            else
+            {
+                MostrarAviso("\n*** Error al consultar el servidor (No autorizado o error de red). ***\n");
+            }
+            break;
+        }
 		case 0:
 		{
 			break;
@@ -559,48 +587,31 @@ int main(int argc, char *argv[])
 
 		case 2:
 		{
+
 			printf("Introduce el texto a Buscar: ");
 			__fpurge(stdin);
 			scanf("%s", texto);
-
-			printf("Código de Consulta\nI. Por Isbn\nT. Por Título\nA. Por Autor\nP. Por país\nD. Por Idioma\n*.- Por todos los campos.\nIntroduce Código: ");
+			printf("Código de Búsqueda\nI. Por Isbn\nT. Por Título\nA. Por Autor\nP. Por País\nD. Por Idioma\n*. Por todos los campos.\nIntroduce Código: ");
 			__fpurge(stdin);
 			scanf("%c", &campo);
-			// numero total de libros
-			res_int = nlibros_1(&anonIda, clnt);
 
-			if (res_int != NULL)
+			res_int = nlibros_1(&idAdmin, clnt);
+			if (res_int)
 			{
 				n_libros = *res_int;
 				cabecera = TRUE;
-				int encontrados = 0;
-
-				// Recorremos todos los libros
 				for (i = 0; i < n_libros; i++)
 				{
-					arg_pos.Ida = anonIda;
+					arg_pos.Ida = idAdmin;
 					arg_pos.Pos = i;
 					res_libro = descargar_1(&arg_pos, clnt);
-
-					if (res_libro != NULL && Comprobar(res_libro, texto, campo))
+					if (Comprobar(res_libro, texto, campo))
 					{
 						MostrarLibro(res_libro, i, cabecera);
 						cabecera = FALSE;
-						encontrados++;
 					}
 				}
-
-				if (encontrados == 0)
-				{
-					printf("\nNo se ha encontrado ningún libro con esos criterios.\n");
-				}
-
-				printf("\n");
 				Pause;
-			}
-			else
-			{
-				MostrarAviso("\n*** Error al comunicarse con el servidor. ***\n");
 			}
 			break;
 		}
