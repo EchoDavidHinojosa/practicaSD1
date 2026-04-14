@@ -297,7 +297,7 @@ int main(int argc, char *argv[])
 		case 1:
 		{
 			printf("Por favor inserte la contraseña de Administración: ");
-			/* DESCOMENTAR */
+			/* DESCOMENTAR ESTO*/
 			//__fpurge(stdin);
 			// scanf("%s", password);
 
