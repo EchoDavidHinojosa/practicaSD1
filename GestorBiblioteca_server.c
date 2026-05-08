@@ -83,9 +83,18 @@ cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 {
 	static int  result;
 	
+	if(argp->Ida!=IdAdmin){
+		result =-1;
+	}
+
+
 	printf("cargar datos");
 	fflush(stdout);
 	FILE*fdatos=fopen(argp->NomFile,"r+b");
+	if(fdatos==NULL){
+	result=0;
+	return &result;
+	}
 	fflush(stdout);
 	fread(&NumLibros,sizeof(NumLibros),1,fdatos);
 	printf("Hay %d libros en el documento",NumLibros);
@@ -111,7 +120,8 @@ cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 	for(int i=0;i<NumLibros;i++){
 		printf("Libro %d de nombre %s",i,Biblioteca[i].Titulo);
 	}
-fclose(fdatos);
+	fclose(fdatos);
+	result =1;
 	return &result;
 }
 
@@ -155,6 +165,17 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 		return &result;
 	}
 	else{
+		
+		int  busqueda = -1;
+    for(int i = 0; i < NumLibros; i++) {
+        if(strcmp(Biblioteca[i].Isbn, argp->Libro.Isbn) == 0) {
+            busqueda = i;
+            break;
+        }
+    }
+	if(busqueda!=-1)
+		result= 0;
+	else{
 		if (NumLibros >= Tama)
 		{
 			Tama += 4;
@@ -164,7 +185,7 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 		NumLibros++;
 		result = 1;
 	}
-
+	}
 	return &result;
 }
 
@@ -231,13 +252,13 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
     }
 
     if(pos == -1) {
-        result = -2;
+        result = 0;
     } else {
         if (Biblioteca[pos].NoLibros >= argp->NoLibros) {
             Biblioteca[pos].NoLibros -= argp->NoLibros;
             result = 1;
         } else {
-            result = 0; 
+            result = 2; 
         }
     }
 	return &result;
@@ -285,17 +306,19 @@ buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
     static int result;
 
     if(argp->Ida != IdAdmin) {
-        result = -1;
+        result = -2;
         return &result;
     }
 
-    result = -2;
+    
+	int result=-1;
     for(int i = 0; i < NumLibros; i++) {
         if(strcmp(Biblioteca[i].Isbn, argp->Isbn) == 0) {
             result = i;
             break;
         }
     }
+
 
     return &result;
 }
