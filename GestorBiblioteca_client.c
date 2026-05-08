@@ -406,8 +406,14 @@ int main(int argc, char *argv[])
                                 res_int = comprar_1(&arg_comret, clnt);
                                 if (res_int != NULL && *res_int == 1) {
                                     MostrarAviso("\n*** Se han añadido los nuevos libros. ***\n");
-                                } else {
-                                     MostrarAviso("\n*** Error al comprar los libros. ***\n");
+								arg_ord.Ida = idAdmin;
+								printf("Código de Ordenación\n0. Por Isbn\n1. Por Título\n2. Por Autor\n3. Por Año\n4. Por Pais\n5. Por Idioma\n6. Por nº de libros Disponibles\n7. Por nº de libros Prestados.\n8. Por nº de libros en espera\nIntroduce Código: ");
+								scanf("%d", &arg_ord.Campo);
+								res_bool = ordenar_1(&arg_ord, clnt);
+									if (res_bool && *res_bool)
+										MostrarAviso("\n*** La biblioteca ha sido ordenada correctamente. ***\n");	
+							} else {
+									MostrarAviso("\n*** Error al comprar los libros. ***\n");
                                 }
                             }
                         } else {

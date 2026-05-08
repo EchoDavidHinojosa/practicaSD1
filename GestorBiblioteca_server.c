@@ -190,17 +190,19 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 		}
 		else{
 			Biblioteca[pos].NoLibros+= argp->NoLibros;
-			if(Biblioteca[pos].NoListaEspera!=0){
-				if(Biblioteca[pos].NoListaEspera<=argp->NoLibros){
-					Biblioteca[pos].NoLibros+= argp->NoLibros-Biblioteca[pos].NoListaEspera;
+			if(Biblioteca[pos].NoListaEspera>0){
+				if(Biblioteca[pos].NoListaEspera<=Biblioteca[pos].NoLibros){
+					Biblioteca[pos].NoLibros+= Biblioteca[pos].NoLibros-Biblioteca[pos].NoListaEspera;
 					Biblioteca[pos].NoPrestados+=Biblioteca[pos].NoListaEspera;
 					Biblioteca[pos].NoListaEspera=0;
 				}
 				else{
-					Biblioteca[pos].NoListaEspera-=argp->NoLibros;
-					Biblioteca[pos].NoPrestados+=argp->NoLibros;
+					Biblioteca[pos].NoListaEspera-=Biblioteca[pos].NoLibros;
+					Biblioteca[pos].NoPrestados+=Biblioteca[pos].NoLibros;
+					Biblioteca[pos].NoLibros=0;
 				}
 			}
+			
 			result = 1;
 			
 		}
@@ -243,7 +245,7 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 bool_t *
 ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 {
-	
+
 	CampoOrdenacion=argp->Campo;
     static bool_t result;
     TLibro aux;
