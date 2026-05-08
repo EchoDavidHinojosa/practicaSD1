@@ -542,7 +542,12 @@ int main(int argc, char *argv[])
 					arg_pos.Pos--;
 					arg_pos.Ida = idAdmin;
 					res_int = prestar_1(&arg_pos, clnt);
-					MostrarAviso("\n*** El préstamo se ha concedido, recoge el libro en el mostrador. ***\n");
+					if(*res_int==1){
+					MostrarAviso("\n*** El préstamo se ha concedido, recoge el libro en el mostrador. ***\n");}
+					else if(*res_int == 0){
+					MostrarAviso("\n*** *Se le ha puesto en la lista de espera**\n");}
+					else{
+					MostrarAviso("\n*** Hay un error con la posicion elegida ***\n");}
 				}
 				else
 				{

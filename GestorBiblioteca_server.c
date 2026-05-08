@@ -81,38 +81,40 @@ desconexion_1_svc(int *argp, struct svc_req *rqstp)
 int *
 cargardatos_1_svc(TFichero *argp, struct svc_req *rqstp)
 {
-	static int result;
-	if(argp->Ida != IdAdmin)	
-	{
-		result = -1;
-		return &result;
+	static int  result;
+	
+	printf("cargar datos");
+	fflush(stdout);
+	FILE*fdatos=fopen(argp->NomFile,"r+b");
+	fflush(stdout);
+	fread(&NumLibros,sizeof(NumLibros),1,fdatos);
+	printf("Hay %d libros en el documento",NumLibros);
+	if(Biblioteca==NULL)
+	Biblioteca=(TLibro*)calloc(NumLibros,sizeof(TLibro));
+	else{
+		free(Biblioteca);
+		Biblioteca=(TLibro*)calloc(NumLibros,sizeof(TLibro));
 	}
-	else
-	{
-		FILE *f_datos = fopen(argp->NomFile, "rb");
-		if (f_datos == NULL)
-		{
-			result = -2;
-			return &result;
-		}
-		fread(&NumLibros, sizeof(int), 1, f_datos);
-		for(int i=0; i<NumLibros; i++)
-		{
-			if (NumLibros > Tama)
-			{
-				Tama += 4;
-				Biblioteca = realloc(Biblioteca, Tama * sizeof(TLibro));
-			}
-			fread(&Biblioteca[i], sizeof(TLibro), 1, f_datos);
-		}
-		strcpy(NomFichero, argp->NomFile);
-		fclose(f_datos);
-		result = 1;
-			
+		
+
+	for (int i=0;i<NumLibros;i++){
+		TLibro LibroLeido;
+		fread(&LibroLeido,sizeof(TLibro),1,fdatos);
+		Biblioteca[i]=LibroLeido;
+
 	}
 
+
+	Tama=NumLibros;
+	strcpy(NomFichero,argp->NomFile);
+	printf( "El nombre del último fichero es %s",NomFichero);
+	for(int i=0;i<NumLibros;i++){
+		printf("Libro %d de nombre %s",i,Biblioteca[i].Titulo);
+	}
+fclose(fdatos);
 	return &result;
 }
+
 
 bool_t *
 guardardatos_1_svc(int *argp, struct svc_req *rqstp)
@@ -184,11 +186,23 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 			}
 		}
 		if(pos == -1){
-			result = -2; // Libro no encontrado	
+			result = 0; // Libro no encontrado	
 		}
 		else{
 			Biblioteca[pos].NoLibros+= argp->NoLibros;
+			if(Biblioteca[pos].NoListaEspera!=0){
+				if(Biblioteca[pos].NoListaEspera<=argp->NoLibros){
+					Biblioteca[pos].NoLibros+= argp->NoLibros-Biblioteca[pos].NoListaEspera;
+					Biblioteca[pos].NoPrestados+=Biblioteca[pos].NoListaEspera;
+					Biblioteca[pos].NoListaEspera=0;
+				}
+				else{
+					Biblioteca[pos].NoListaEspera-=argp->NoLibros;
+					Biblioteca[pos].NoPrestados+=argp->NoLibros;
+				}
+			}
 			result = 1;
+			
 		}
 	}
 
@@ -229,6 +243,8 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 bool_t *
 ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 {
+	
+	CampoOrdenacion=argp->Campo;
     static bool_t result;
     TLibro aux;
 
@@ -239,7 +255,7 @@ ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 
     for(int i = 0; i < NumLibros - 1; i++) {
         for(int j = i + 1; j < NumLibros; j++) {
-            if(EsMenor(j, i, argp->Campo)) {
+            if(EsMenor(j, i, CampoOrdenacion)) {
                 aux = Biblioteca[i];
                 Biblioteca[i] = Biblioteca[j];
                 Biblioteca[j] = aux;
@@ -287,14 +303,22 @@ descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static TLibro result;
 
-	if(argp->Ida != IdAdmin){
-		printf("Error: No autorizado\n");
-		return NULL;
-	}
-	else{
+		if(argp->Pos>=NumLibros|| argp==NULL){
+		strcpy(result.Titulo,"????");
+		strcpy(result.Autor,"????");
+		strcpy(result.Idioma,"????");
+		strcpy(result.Isbn,"????");
+		strcpy(result.Pais,"????");
+		result.Anio=0;
+		result.NoLibros=0;
+		result.NoListaEspera=0;
+		result.NoPrestados=0;
+		}
+		else{
 		result = Biblioteca[argp->Pos];	
 		printf("Libro descargado: %s", result.Titulo);
-	}
+		}
+
 	return &result;
 }
 
@@ -303,10 +327,6 @@ prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
     static int result;
 
-    if(argp->Ida != IdAdmin) {
-        result = -1;
-        return &result;
-    }
 
     if(argp->Pos >= 0 && argp->Pos < NumLibros) {
         if(Biblioteca[argp->Pos].NoLibros > 0) {
@@ -318,7 +338,7 @@ prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
             result = 0;
         }
     } else {
-        result = -2;
+        result = -1;
     }
 
     return &result;
@@ -329,26 +349,23 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
     static int result;
 
-    if(argp->Ida != IdAdmin) {
-        result = -1;
-        return &result;
-    }
-
     if(argp->Pos >= 0 && argp->Pos < NumLibros) {
         if(Biblioteca[argp->Pos].NoPrestados > 0) {
             if(Biblioteca[argp->Pos].NoListaEspera > 0) {
                 Biblioteca[argp->Pos].NoListaEspera--;
+				result =0;
             } else {
                 Biblioteca[argp->Pos].NoLibros++;
                 Biblioteca[argp->Pos].NoPrestados--;
+				result =1;
             }
-            result = 1;
-        } else {
-            result = 0;
-        }
+            
+        }else{
+			result =2;
+		}
     } else {
-        result = -2;
-    }
+            result = -1;
+        }
 
     return &result;
 }
