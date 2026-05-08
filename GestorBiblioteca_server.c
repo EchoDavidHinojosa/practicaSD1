@@ -311,7 +311,7 @@ buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
     }
 
     
-	int result=-1;
+	 result=-1;
     for(int i = 0; i < NumLibros; i++) {
         if(strcmp(Biblioteca[i].Isbn, argp->Isbn) == 0) {
             result = i;
